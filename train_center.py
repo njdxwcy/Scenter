@@ -32,7 +32,7 @@ parser.add_argument('--dist', action='store_true')
 
 parser.add_argument('--root_dir', type=str, default='./')
 parser.add_argument('--data_dir', type=str, default='/home/wangchunyu/PyTorch-Spiking-YOLOv3-ultralytics/data/')
-parser.add_argument('--log_name', type=str, default='test')
+parser.add_argument('--log_name', type=str, default='test_mob')
 parser.add_argument('--pretrain_name', type=str, default='pretrain')
 
 parser.add_argument('--dataset', type=str, default='coco', choices=['coco', 'pascal'])
@@ -41,9 +41,9 @@ parser.add_argument('--arch', type=str, default='large_hourglass')
 parser.add_argument('--img_size', type=int, default=512)
 parser.add_argument('--split_ratio', type=float, default=1.0)
 
-parser.add_argument('--lr', type=float, default=0.01)
+parser.add_argument('--lr', type=float, default=1e-3)
 parser.add_argument('--lr_step', type=str, default='90,120')
-parser.add_argument('--batch_size', type=int, default=16)
+parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--num_epochs', type=int, default=140)
 
 parser.add_argument('--test_topk', type=int, default=100)
@@ -56,8 +56,8 @@ cfg = parser.parse_args()
 
 os.chdir(cfg.root_dir)
 
-cfg.log_dir = os.path.join(cfg.root_dir, 'logs', cfg.log_name)
-cfg.ckpt_dir = os.path.join(cfg.root_dir, 'ckpt', cfg.log_name)
+cfg.log_dir = os.path.join(cfg.root_dir, 'logs_mob', cfg.log_name)
+cfg.ckpt_dir = os.path.join(cfg.root_dir, 'ckpt_mob', cfg.log_name)
 #cfg.pretrain_dir = os.path.join(cfg.root_dir, 'ckpt', cfg.pretrain_name, 'checkpoint.t7')
 
 os.makedirs(cfg.log_dir, exist_ok=True)
@@ -107,7 +107,7 @@ def main():
                                             collate_fn=val_dataset.collate_fn)
 
     print('Creating model...')
-    model_path='cfg/center_raw.cfg'
+    model_path='cfg/mobile_center.cfg'
     model = Darknet(model_path).to(cfg.device)
     summary(model, (3, 512, 512))
     '''
@@ -128,6 +128,7 @@ def main():
             "See https://github.com/ultralytics/yolov3/issues/657" % (opt.weights, opt.cfg, opt.weights)
         raise KeyError(s) from e
     '''
+    
     ema = torch_utils.ModelEMA(model)
     
     optimizer = torch.optim.Adam(model.parameters(), cfg.lr)
@@ -241,6 +242,7 @@ def main():
        
 
     summary_writer.close()
+    
  
 
 if __name__ == '__main__':
