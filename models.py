@@ -336,7 +336,7 @@ class Darknet(nn.Module):
                 print('%g/%g %s -' % (i, len(self.module_list), name), list(x.shape), str)
                 str = ''
 
-            if (i==100 or i==103 or i==97):
+            if (i==77 or i==83 or i==80):
                 center.append(x)
             center_all=[center]
 
